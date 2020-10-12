@@ -82,6 +82,8 @@
 
 <p>3) Определите категорию АС: сайт статической верстки, обновление выполняется по FTP.</p>
 
+<h3>Основные требования к АС</h3>
+
 <p>Идентификация, проверка подлинности и контроль доступа субъектов</p>
 
 <p>Регистрация и учет: входа (выхода) субъектов доступа в (из) систему(ы) (узел сети)</p>
@@ -219,11 +221,59 @@
 
 <h1>Лабораторные работы: Развертывание шлюза и сетей предприятия</h1>
 
+<h2>Работа с nmap</h2>
+
+<pre><code>student@PC / $ nmap localhost
+
+Starting Nmap 7.40 ( https://nmap.org ) at 2020-10-12 18:03 +05
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000084s latency).
+Other addresses for localhost (not scanned): ::1
+Not shown: 995 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+25/tcp   open  smtp
+80/tcp   open  http
+631/tcp  open  ipp
+8081/tcp open  blackice-icecap
+
+Nmap done: 1 IP address (1 host up) scanned in 0.08 seconds
+student@PC / $ nmap -A localhost
+
+Starting Nmap 7.40 ( https://nmap.org ) at 2020-10-12 18:03 +05
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000081s latency).
+Other addresses for localhost (not scanned): ::1
+Not shown: 995 closed ports
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh      OpenSSH 7.4p1 Debian 10+deb9u7 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 34:ca:ed:e8:f9:61:1d:4a:6f:35:20:04:1e:2c:6c:a1 (RSA)
+|_  256 12:15:e1:57:9a:92:98:0c:9f:bd:9b:0a:b1:29:bc:8e (ECDSA)
+25/tcp   open  smtp     Exim smtpd 4.89
+| smtp-commands: PC Hello localhost [127.0.0.1], SIZE 52428800, 8BITMIME, PIPELINING, PRDR, HELP, 
+|_ Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET HELP 
+80/tcp   open  http     Apache httpd 2.4.25 ((Debian))
+|_http-server-header: Apache/2.4.25 (Debian)
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+631/tcp  open  ipp      CUPS 2.2
+| http-methods: 
+|_  Potentially risky methods: PUT
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-server-header: CUPS/2.2 IPP/2.1
+|_http-title: Home - CUPS 2.2.1
+8081/tcp open  backdoor No-auth shell (**BACKDOOR**)
+Service Info: Host: PC; OSs: Linux, Unix; CPE: cpe:/o:linux:linux_kernel
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 7.61 seconds
+</code></pre>
+
 <h2>Настройка шлюза для подключения сети предприятия к Internet</h2>
 
 <p><a href="https://clck.ru/RLqPk">Обеспечение работоспособности и защиты межсетевого экрана с помощью iptables</a></p>
 
-<p><img src="qr-code-a.gif" alt="qr-code-a" title="" /></p>
+<p><a href="https://clck.ru/RMGKn">Проброс портов в локальную сеть с помощью iptables</a></p>
 
 <p>1) Изучить литературу по ссылке.</p>
 
