@@ -311,14 +311,17 @@
 ### Инструмент Nmap 
 
 Nmap — свободная утилита, предназначенная для разнообразного настраиваемого сканирования IP-сетей с любым количеством объектов, определения состояния объектов сканируемой сети (портов и соответствующих им служб). Изначально программа была реализована для систем UNIX, но сейчас доступны версии для множества операционных систем.
-Nmap использует множество различных методов сканирования, таких как UDP, TCP (connect), TCP SYN (полуоткрытое), FTP-proxy (прорыв через ftp), Reverse-ident, ICMP (ping), FIN, ACK, Xmas tree, SYN- и NULL-сканирование. Nmap также поддерживает большой набор дополнительных возможностей, а именно: определение операционной системы удалённого хоста с использованием отпечатков стека TCP/IP, «невидимое» сканирование, динамическое вычисление времени задержки и повтор передачи пакетов, параллельное сканирование, определение неактивных хостов методом параллельного ping-опроса, сканирование с использованием ложных хостов, определение наличия пакетных фильтров, прямое (без использования portmapper) RPC-сканирование, сканирование с использованием IP-фрагментации, быстрый поиск уязвимостей SQL Injection, а также произвольное указание IP-адресов и номеров портов сканируемых сетей.
+
+Nmap использует множество различных методов сканирования, таких как UDP, TCP (connect), TCP SYN (полуоткрытое), FTP-proxy (прорыв через ftp), Reverse-ident, ICMP (ping), FIN, ACK, Xmas tree, SYN- и NULL-сканирование. Nmap также поддерживает большой набор дополнительных возможностей, а именно: определение операционной системы удалённого хоста с использованием отпечатков стека TCP/IP, «невидимое» сканирование, динамическое вычисление времени задержки и повтор передачи пакетов, параллельное сканирование, определение неактивных хостов методом параллельного ping-опроса, сканирование с использованием ложных хостов, определение наличия пакетных фильтров, прямое (без использования portmapper) RPC-сканирование, сканирование с использованием IP-фрагментации, поиск уязвимостей SQL Injection, а также произвольное указание IP-адресов и номеров портов сканируемых сетей.
 
 ![Nmap-4.53.png](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Nmap-4.53.png/800px-Nmap-4.53.png)
 
 ### Инструмент Wireshark 
 
 Wireshark — программа-анализатор трафика для компьютерных сетей Ethernet и некоторых других. Имеет графический пользовательский интерфейс. Изначально проект назывался Ethereal, но, из-за проблем с торговой маркой, в июне 2006 года проект был переименован в Wireshark.
+
 Функциональность, которую предоставляет Wireshark, очень схожа с возможностями программы tcpdump, однако Wireshark имеет графический пользовательский интерфейс и гораздо больше возможностей по сортировке и фильтрации информации. Программа позволяет пользователю просматривать весь проходящий по сети трафик в режиме реального времени, переводя сетевую карту в неразборчивый режим (англ. promiscuous mode).
+
 Программа распространяется под свободной лицензией GNU GPL и использует для формирования графического интерфейса кроссплатформенную библиотеку GTK+ (планируется переход на Qt). Существуют версии для большинства UNIX-подобных систем, в том числе GNU/Linux, Solaris, FreeBSD, NetBSD, OpenBSD, Mac OS X, а также для Windows.
 
 ![Wireshark](https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Wireshark_3.0.3_screenshot.png/800px-Wireshark_3.0.3_screenshot.png)
@@ -391,3 +394,235 @@ Nikto выиграл "Best IT Security Tools for 2009" от Security-Database в
 	631/tcp open  ipp
 
 	Nmap done: 256 IP addresses (4 hosts up) scanned in 6.08 seconds
+
+### Определение типа сервиса на указанном хосте/порту
+
+Используется типовой порт:
+
+	$ nmap -A -p 631 192.168.43.180
+
+Результат:
+
+	Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-13 12:28 +05
+	Nmap scan report for extralab (192.168.43.180)
+	Host is up (0.0026s latency).
+	PORT    STATE SERVICE VERSION
+	631/tcp open  ipp     CUPS 2.2
+	| http-methods: 
+	|_  Potentially risky methods: PUT
+	| http-robots.txt: 1 disallowed entry 
+	|_/
+	|_http-server-header: CUPS/2.2 IPP/2.1
+	|_http-title: Home - CUPS 2.2.1
+
+	Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+	Nmap done: 1 IP address (1 host up) scanned in 6.95 seconds
+
+Обнаружен CUPS версии 2.2.1.
+
+![cups](cups.png)
+
+Используется "левый" порт и фальшивый сервер:
+
+![fakehttp](fakehttp.png)
+
+	echo "HTTP/1.1 200 OK"
+	echo "Date: Wed, 11 Feb 2009 11:20:59 GMT"
+	echo "Server: Apache"
+	echo "X-Powered-By: PHP/5.2.4-2ubuntu5wm1"
+	echo "Last-Modified: Wed, 11 Feb 2009 11:20:59 GMT"
+	echo "Content-Language: ru"
+	echo "Content-Type: text/html; charset=utf-8"
+	echo "Connection: close"
+	echo ""
+	echo "<pre>"
+	date
+	echo "</pre>"
+
+Peзультат:
+
+	$ nmap -A -p 8080 localhost
+	Starting Nmap 7.80 ( https://nmap.org ) at 2020-10-13 12:46 +05
+	Nmap scan report for localhost (127.0.0.1)
+	Host is up (0.000065s latency).
+
+	PORT     STATE SERVICE    VERSION
+	8080/tcp open  http-proxy Apache
+	| fingerprint-strings: 
+	|   NULL: 
+	|     HTTP/1.1 200 OK
+	|     Date: Wed, 11 Feb 2009 11:20:59 GMT
+	|     Server: Apache
+	|     X-Powered-By: PHP/5.2.4-2ubuntu5wm1
+	|     Last-Modified: Wed, 11 Feb 2009 11:20:59 GMT
+	|     Content-Language: ru
+	|     Content-Type: text/html; charset=utf-8
+	|     Connection: close
+	|     <pre>
+	|     2020 12:46:01 +05
+	|_    </pre>
+	| http-open-proxy: Potentially OPEN proxy.
+	|_Methods supported:CONNECTION
+	|_http-server-header: Apache
+	1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+	SF-Port8080-TCP:V=7.80%I=7%D=10/13%Time=5F855B39%P=x86_64-pc-linux-gnu%r(N
+	SF:ULL,111,"HTTP/1\.1\x20200\x20OK\nDate:\x20Wed,\x2011\x20Feb\x202009\x20
+	SF:11:20:59\x20GMT\nServer:\x20Apache\nX-Powered-By:\x20PHP/5\.2\.4-2ubunt
+	SF:u5wm1\nLast-Modified:\x20Wed,\x2011\x20Feb\x202009\x2011:20:59\x20GMT\n
+	SF:Content-Language:\x20ru\nContent-Type:\x20text/html;\x20charset=utf-8\n
+	SF:Connection:\x20close\n\n<pre>\n\xd0\x92\xd1\x82\x2013\x20\xd0\xbe\xd0\x
+	SF:ba\xd1\x82\x202020\x2012:46:01\x20\+05\n</pre>\n");
+
+Peзультат на порту 18765:
+
+	$ nmap -A localhost
+	...
+	PORT    STATE SERVICE VERSION
+	22/tcp  open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+	631/tcp open  ipp     CUPS 2.3
+	...
+
+Фальшивый сервер *не обнаружен!*
+
+	$ while true; do cat a | nc -l -p 18765 | ./http.sh > a; done
+	GET / HTTP/1.0
+
+	$ while true; do cat a | nc -l -p 8080 | ./http.sh > a; done
+	GET / HTTP/1.0
+
+	OPTIONS / HTTP/1.0
+
+	GET / HTTP/1.1
+	Host: localhost:8080
+	Connection: close
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+	PROPFIND / HTTP/1.1
+	Depth: 1
+	Content-Length: 0
+	Host: localhost:8080
+	Connection: close
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+	GET / HTTP/1.1
+	Host: localhost:8080
+	Connection: close
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+	GET / HTTP/1.1
+	Host: localhost:8080
+	Connection: close
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+Сервер возвращает случайные коды:
+
+	$ while true; do cat a | nc -l -p 8080 | ./http.sh > a; done
+	GET / HTTP/1.0
+
+	ieU��random1random2random3random4
+	                                 /
+	GET / HTTP/1.1
+	Connection: close
+	Host: localhost:8080
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+	GET /favicon.ico HTTP/1.1
+	Connection: close
+	Host: localhost:8080
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+	�f��Q�%�/N�+����l[��f#B�i�
+
+	                          H� �Vd�
+	                                 �b%�]eWP]�25>�F�w�%شJueJ�395/�,�0��̨̩̪���������]�a�W�S�+�/������������`�V�R�$�(kj�s�w�
+	�8���	�2��ED������Q������P=�<���A�
+	                                    	localhost
+
+
+
+	*(
+	GET / HTTP/1.1
+	Connection: close
+	Host: localhost:8080
+	User-Agent: Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)
+
+Результат:
+
+	$ nmap -A localhost -p 8080
+	PORT     STATE SERVICE     VERSION
+	8080/tcp open  http-proxy?
+
+Сервер не распознан. Что не мешает злоумышленнику работать с ним. 
+
+Вывод. От nmap можно спрятать сервер, если разместить его вне диапазона портов, 
+сканируемых по-умолчанию и нарушить алгоритм его работы. 
+На действия злоумышленника это никак не повлияет.
+
+### Расшифровка http-траффика с Wireshark
+
+![Wireshark](wireshark.png)
+
+Провели сканирование фэйкового http-сервера и получили следующий траффик:
+
+![Wireshark](decode_0.png)
+
+### Задача:
+Провести сканирование собственного хоста с проброшенным портом и:
+
+- определить факт сканирования по данным wireshark
+- определить используемое ПО
+
+## Подробнее про сканирование
+
+Cocтояния порта:
+- open (открытый порт)  — порт открыт, и служба принимает TCP- или UDP-соединения по этому порту (данный порт наиболее уязвим для взлома);
+- filtered — порт закрыт брандмауэром, иной блокирующей программой или службой (правила роутера, аппаратный брандмауэр и т.п.);
+- closed — порт закрыт, так как нет службы или иной программы, прослушивающей этот порт на компьютере.
+- unfiltered — Nmap не смог точно определить, открыт порт или закрыт, обычно такое значение присваивается при сканировании методом ACK 
+
+*Вывод:*
+
+Закрыть порт нельзя никак кроме завершения процесса, его открывшего. Отфильтровать - можно.
+Нет смысла "закрывать" на fw порты, которые не прослушиваются ни одной программой.
+
+Подробнее:
+
+[Сетевой сканер Nmap как средство аудита локальной сети](https://clck.ru/RN7sk)
+
+## Руткиты и их обнаружение
+
+[Установка, настройка и использование сканера уязвимостей chkrootkit](https://clck.ru/RN8GE)
+
+Руткит (англ. rootkit, то есть «набор root-а») — набор программных средств (например, исполняемых файлов, скриптов, конфигурационных файлов), обеспечивающих:
+
+ - маскировку объектов (процессов, файлов, каталогов, драйверов);
+ - управление (событиями, происходящими в системе);
+ - сбор данных (параметров системы).
+
+Термин Rootkit исторически пришёл из мира UNIX, и под этим термином понимается набор утилит или специальный модуль ядра, которые злоумышленник устанавливает на взломанной им компьютерной системе сразу после получения прав суперпользователя. Этот набор, как правило, включает в себя разнообразные утилиты для «заметания следов» вторжения в систему, делает незаметными снифферы, сканеры, кейлоггеры, троянские программы, замещающие основные утилиты UNIX (в случае не ядерного руткита). Rootkit позволяет взломщику закрепиться во взломанной системе и скрыть следы своей деятельности путём скрытия файлов, процессов, а также самого присутствия руткита в системе.
+
+В систему руткит может быть установлен различными способами: загрузка посредством эксплойта, после получения шелл-доступа (в таком случае, может использоваться средство типа wget или исходный FTP-клиент для загрузки руткита с удаленного устройства), в исходном коде или ресурсах программного продукта. 
+
+
+- В Microsoft Windows
+	- Захват таблиц вызовов
+	- Перехват модификацией кода функции
+	- DKOM (Direct Kernel Object Manipulation, прямая манипуляция объектами ядра)
+	- Драйверы
+- В UNIX и Linux
+    - Подмена основных системных утилит 
+    - В виде модуля ядра и основанные на патчинге VFS или перехвате таблицы системных вызовов
+    - Модификация физической памяти ядра.
+
+Поиск:
+
+- Сигнатурный поиск. Применяется еще со времен первых антивирусов и представляет собой поиск в проверяемом файле уникальной цепочки байтов (сигнатуры), присущей вредоносной программе.
+- Эвристический или поведенческий анализатор. Эта технология основывается на поиске отклонений в настройках системы, конфигурационных файлах Linux или реестре Windows, подозрительном поведении процессов и модулей и так далее.
+- Контроль целостности. Этот тип поиcка основан на сравнении контрольной суммы (MD5 и тому подобное) или цифровой пoдписи разнообразных системных файлов с базой, содержащей контрольную сумму оpигинальных файлов. В случае несовпадения программа делает вывод, что файл был модифицирован или вовсе заменен.
+
+## Лабораторные работы
+
+1. Cоздать простейший руткит - разместить в "секретном" месте набор шелл-команд с SUID на root.
+2. С его помощью создать фэйк-сервер http (код выше).
+3. Попытаться обнаружить его различными типовыми сканерами.
+4. Сформировать отчет на git.
