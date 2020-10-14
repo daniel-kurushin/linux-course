@@ -11,17 +11,18 @@ for topic in topic_list:
 		desc_pars = wiki.find('div', 'mw-parser-output')('p')[0:3]
 		desc = ""
 		for p in desc_pars:
-			desc += p.text
+			desc += p.text + "\n"
 
 		print("### Инструмент %s " % topic)
 		print()
-		print(desc)
+		print(re.sub(pattern=r'\[\d+\]', string=desc, repl=' '))
 
 		try:
-			img_container = wiki.find('span', 'wikidata-main-snak')
-			src = re.sub(pattern=r'\/\d+px', string=img_container.a.img['src'], repl='/800px')
-			alt = img_container.a.img['alt']
-			print("!'[%s](https://%s)" % (alt, src))
+			img_containers = wiki('span', 'wikidata-main-snak')
+			for img_container in img_containers:
+				src = re.sub(pattern=r'\/\d+px', string=img_container.a.img['src'], repl='/800px')
+				alt = img_container.a.img['alt']
+				print("![%s](https://%s)" % (alt, src))
 		except AttributeError:
 			print("#### noimage")
 	except TypeError:
