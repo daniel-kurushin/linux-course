@@ -2005,6 +2005,7 @@ $ ./easyrsa revoke developer5
 
 
 Содержимое файла server.conf
+
 	port 1194
 	proto udp
 	dev tun
